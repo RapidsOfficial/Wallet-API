@@ -1,4 +1,4 @@
-const { Wallet, Account } = require('@dashevo/wallet-lib');
+const { Wallet,EVENTS, Account } = require('@dashevo/wallet-lib');
 
 const DAPIClient  = require('@dashevo/dapi-client');
 const { Mnemonic } = require('@dashevo/dashcore-lib');
