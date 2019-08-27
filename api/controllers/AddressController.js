@@ -41,17 +41,20 @@ const AddressController = () => {
         // get accounts
 
         const account = wallet.getAccount();
-
+        let totalBalance;
+        let unUsedAddresses;
+        let confirmedBalance;
+        let unconfirmedBalance;
 
 
         const start = async () => {
               console.log('Balance Conf', await account.getConfirmedBalance(false));
               console.log('Balance Unconf', await account.getUnconfirmedBalance(false));
               console.log('New Addr', await account.getUnusedAddress().address);
-              const unUsedAddresses = await account.getAddresses();
-              const totalBalance = await account.getTotalBalance();
-              const confirmedBalance = await account.getConfirmedBalance();
-              const unconfirmedBalance = await account.getUnconfirmedBalance();
+               unUsedAddresses = await account.getAddresses();
+               totalBalance = await account.getTotalBalance();
+               confirmedBalance = await account.getConfirmedBalance(false);
+               unconfirmedBalance = await account.getUnconfirmedBalance(false);
               //
               // const tx = account.createTransaction({recipient:'yhvXpqQjfN9S4j5mBKbxeGxiETJrrLETg5', amount:5.74});
               // console.log(tx.toString());
