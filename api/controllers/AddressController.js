@@ -41,10 +41,23 @@ const AddressController = () => {
         // get accounts
 
         const account = wallet.getAccount();
-        const unUsedAddresses = account.getAddresses();
-        const totalBalance = account.getTotalBalance();
-        const confirmedBalance = account.getConfirmedBalance();
-        const unconfirmedBalance = account.getUnconfirmedBalance();
+
+
+
+        const start = async () => {
+              console.log('Balance Conf', await account.getConfirmedBalance(false));
+              console.log('Balance Unconf', await account.getUnconfirmedBalance(false));
+              console.log('New Addr', await account.getUnusedAddress().address);
+              const unUsedAddresses = await account.getAddresses();
+              const totalBalance = await account.getTotalBalance();
+              const confirmedBalance = await account.getConfirmedBalance();
+              const unconfirmedBalance = await account.getUnconfirmedBalance();
+              //
+              // const tx = account.createTransaction({recipient:'yhvXpqQjfN9S4j5mBKbxeGxiETJrrLETg5', amount:5.74});
+              // console.log(tx.toString());
+              // const bdc = await account.broadcastTransaction(tx.toString());
+              // console.log(bdc)
+            };
         account.events.on(EVENTS.GENERATED_ADDRESS, (info) => { console.log('GENERATED_ADDRESS'); });
         account.events.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (info) => { console.log('CONFIRMED_BALANCE_CHANGED', info, info.delta); });
         account.events.on(EVENTS.UNCONFIRMED_BALANCE_CHANGED, (info) => { console.log('UNCONFIRMED_BALANCE_CHANGED', info); });
