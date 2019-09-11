@@ -1,5 +1,5 @@
 // Import the wallet libraries
-const { Wallet } = require('@dashevo/wallet-lib');
+const { Wallet, EVENTS } = require('@dashevo/wallet-lib');
 const DAPIClient  = require('@dashevo/dapi-client');
 const { Mnemonic } = require('@dashevo/dashcore-lib');
 const WalletModel = require('../models/Wallet');
@@ -14,6 +14,7 @@ const transport = new DAPIClient({
     port:3000
   }],
 });
+let globalAccount;
 
 const WalletController = () => {
   const createWallet = async (req, res) => {
@@ -26,8 +27,10 @@ const WalletController = () => {
         const wallet = new Wallet(opts);
         walletId = wallet.walletId + '-' + uuidv4();
         const account = wallet.createAccount();
-        const getac = wallet.getAccount({index:0});
-        const addresses = account.getAddresses();
+        const getac = wallet.getAccount();
+        globalAccount = getac;
+        const addresses = account.getUnusedAddress().address;
+
         const walletUser = await WalletModel.create({
           walletId: walletId,
           network: wallet.network.name,
@@ -42,8 +45,7 @@ const WalletController = () => {
           include: [{ model: Address,
                     as: 'addresses'}]
         });
-        wallet.disconnect();
-        account.disconnect()
+        await events(getac);
         return res.status(200).json({ walletUser });
       } catch (err) {
         console.log(err);
@@ -60,6 +62,34 @@ const WalletController = () => {
       network: 'livenet'
     })
   }
+
+  const start = async() => {
+
+    const confirmedBalance = await globalAccount.getConfirmedBalance(false);
+    const unConfirmed = await globalAccount.getUnconfirmedBalance(false);
+    const address = await globalAccount.getUnusedAddress().address;
+
+    return data = {
+      confirmedBalance, unConfirmed, address
+    }
+
+  };
+
+  const events = async() => {
+    account = globalAccount;
+    account.events.on(EVENTS.GENERATED_ADDRESS, (info) => { console.log('GENERATED_ADDRESS'); });
+    account.events.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (info) => { console.log('CONFIRMED_BALANCE_CHANGED', info, info.delta); });
+    account.events.on(EVENTS.UNCONFIRMED_BALANCE_CHANGED, (info) => { console.log('UNCONFIRMED_BALANCE_CHANGED', info); });
+    account.events.on(EVENTS.READY, start);
+    account.events.on(EVENTS.BLOCKHEIGHT_CHANGED, info => console.log('BLOCKHEIGHT_CHANGED:', info));
+    account.events.on(EVENTS.PREFETCHED, () => { console.log(EVENTS.PREFETCHED); });
+    account.events.on(EVENTS.DISCOVERY_STARTED, () => console.log(EVENTS.PREFETCHED));
+
+
+  }
+
+
+
 
   return {
     createWallet

@@ -4,7 +4,8 @@ const DAPIClient  = require('@dashevo/dapi-client');
 const { Mnemonic } = require('@dashevo/dashcore-lib');
 const WalletModel = require('../models/Wallet');
 const Address = require('../models/Address');
-
+const axios = require('axios');
+const _ = require('lodash');
 
 const network = 'livenet' // or 'testnet'
 const transport = new DAPIClient({
@@ -13,6 +14,9 @@ const transport = new DAPIClient({
     port:3000
   }],
 });
+const explorerAPI = 'http://127.0.0.1:3001/' // Change this to RapidsExplorer
+let balance;
+let account;
 
 
 const AddressController = () => {
@@ -33,51 +37,58 @@ const AddressController = () => {
         mnemonic = cal[0].mnemonic;
         privateKey = cal[0].privateKey;
 
+        // Get the stored adddress
+
+        address = await Address.findAll({
+          where: {
+            walletId: cal[0].id
+          }
+        })
+
+        addr = JSON.stringify(address)
+        addres = JSON.parse(addr)
+
+        address = addres[0].address
+
         opts = {
           transport, network, mnemonic, privateKey
         }
 
         wallet = new Wallet(opts);
-        // get accounts
-
-        const account = wallet.getAccount();
-        let totalBalance;
-        let unUsedAddresses;
-        let confirmedBalance;
-        let unconfirmedBalance;
-
-
-        const start = async () => {
-              console.log('Balance Conf', await account.getConfirmedBalance(false));
-              console.log('Balance Unconf', await account.getUnconfirmedBalance(false));
-              console.log('New Addr', await account.getUnusedAddress().address);
-               unUsedAddresses = await account.getAddresses();
-               totalBalance = await account.getTotalBalance();
-               confirmedBalance = await account.getConfirmedBalance(false);
-               unconfirmedBalance = await account.getUnconfirmedBalance(false);
-              //
-              // const tx = account.createTransaction({recipient:'yhvXpqQjfN9S4j5mBKbxeGxiETJrrLETg5', amount:5.74});
-              // console.log(tx.toString());
-              // const bdc = await account.broadcastTransaction(tx.toString());
-              // console.log(bdc)
-            };
-        account.events.on(EVENTS.GENERATED_ADDRESS, (info) => { console.log('GENERATED_ADDRESS'); });
-        account.events.on(EVENTS.CONFIRMED_BALANCE_CHANGED, (info) => { console.log('CONFIRMED_BALANCE_CHANGED', info, info.delta); });
-        account.events.on(EVENTS.UNCONFIRMED_BALANCE_CHANGED, (info) => { console.log('UNCONFIRMED_BALANCE_CHANGED', info); });
-        account.events.on(EVENTS.READY, start);
-        account.events.on(EVENTS.BLOCKHEIGHT_CHANGED, info => console.log('BLOCKHEIGHT_CHANGED:', info));
-        account.events.on(EVENTS.PREFETCHED, () => { console.log(EVENTS.PREFETCHED); });
-        account.events.on(EVENTS.DISCOVERY_STARTED, () => console.log(EVENTS.PREFETCHED));
-
-        return res.status(200).json({ totalBalance,confirmedBalance ,  unconfirmedBalance, unUsedAddresses });
+        // get account
+        // What works is to fetch balance from the Api
+        await getBalance(address)
+        return res.status(200).json({ balance });
       } catch (err) {
-        console.log(err);
         return res.status(500).json({ msg: 'Internal server error' , err});
       }
     }
 
     return res.status(400).json({ msg: 'Bad Request: Address field is must' });
   };
+
+
+ /// I need to be able to fetch balance from the API
+
+ const getBalance = async (address) => {
+   pathAPI = explorerAPI + 'public/address?address='+ address
+  await  axios.get(pathAPI).then(response => {
+     console.log(response.data)
+     if (_.isEmpty(response.data)){
+        balance = {msg: "This address has not UTXO found"}
+        return ({msg: "This address has not UTXO found"})
+     } else {
+       balance = response.data
+       return response.data
+     }
+
+   })
+   .catch(error => {
+     console.log(error)
+   })
+
+ }
+
 
   return {
     getAddress
