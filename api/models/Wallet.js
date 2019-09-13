@@ -10,6 +10,10 @@ const Wallet = sequelize.define('Wallet', {
     type: Sequelize.STRING,
     unique: true,
   },
+  walletName:{
+    type: Sequelize.STRING,
+    unique:true,
+  },
   network: {
     type: Sequelize.STRING
   },

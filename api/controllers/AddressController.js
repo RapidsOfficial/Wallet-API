@@ -1,20 +1,11 @@
-const { Wallet,EVENTS, Account } = require('@dashevo/wallet-lib');
-
-const DAPIClient  = require('@dashevo/dapi-client');
-const { Mnemonic } = require('@dashevo/dashcore-lib');
 const WalletModel = require('../models/Wallet');
 const Address = require('../models/Address');
 const axios = require('axios');
 const _ = require('lodash');
 
 const network = 'livenet' // or 'testnet'
-const transport = new DAPIClient({
-  seeds: [{
-    service: '0.0.0.0:30002',
-    port:3000
-  }],
-});
-const explorerAPI = 'http://127.0.0.1:3001/' // Change this to RapidsExplorer
+
+const explorerAPI = 'https://rapidsexplorer.com' // Change this to RapidsExplorer
 let balance;
 let account;
 
@@ -34,8 +25,6 @@ const AddressController = () => {
         objects = JSON.stringify(walletFromDB);
         cal = JSON.parse(objects);
 
-        mnemonic = cal[0].mnemonic;
-        privateKey = cal[0].privateKey;
 
         // Get the stored adddress
 
@@ -49,14 +38,6 @@ const AddressController = () => {
         addres = JSON.parse(addr)
 
         address = addres[0].address
-
-        opts = {
-          transport, network, mnemonic, privateKey
-        }
-
-        wallet = new Wallet(opts);
-        // get account
-        // What works is to fetch balance from the Api
         await getBalance(address)
         return res.status(200).json({ balance });
       } catch (err) {
@@ -71,7 +52,7 @@ const AddressController = () => {
  /// I need to be able to fetch balance from the API
 
  const getBalance = async (address) => {
-   pathAPI = explorerAPI + 'public/address?address='+ address
+   pathAPI = explorerAPI + '/ext/getaddress/'+address
   await  axios.get(pathAPI).then(response => {
      console.log(response.data)
      if (_.isEmpty(response.data)){

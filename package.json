@@ -12,7 +12,6 @@
     "url": "https://github.com/aichbauer/express-rest-api-boilerplate/issues"
   },
   "scripts": {
-    "prestart": "npm run drop-sqlite-db || true",
     "start": "npm run nodemon",
     "poststart": "npm run create-sqlite-db",
     "dev": "cross-env NODE_ENV=development node ./api/api.js",
@@ -36,11 +35,10 @@
     ]
   },
   "dependencies": {
-    "@dashevo/dapi-client": "^0.6.5",
-    "@dashevo/dashcore-lib": "^0.17.9",
-    "@dashevo/wallet-lib": "^4.0.0",
     "axios": "^0.19.0",
     "bcrypt-nodejs": "^0.0.3",
+    "bitcore-lib": "^8.7.1",
+    "bitcoin-core": "2.2.0",
     "body-parser": "^1.18.2",
     "core-js": "^2.6.9",
     "cors": "^2.8.4",
