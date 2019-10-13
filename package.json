@@ -1,15 +1,15 @@
 {
-  "name": "express-rest-api-boilerplate",
-  "version": "0.0.0",
-  "author": "Lukas Aichbauer <l.aichbauer@gmail.com>",
+  "name": "Wallet-api",
+  "version": "0.0.1",
+  "author": "Saransh Sharma <saransh@theupscale.in>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aichbauer/express-rest-api-boilerplate.git"
+    "url": "git+https://github.com/Open-crypto-API/API"
   },
-  "homepage": "https://github.com/aichbauer/express-rest-api-boilerplate#readme",
+  "homepage": "https://github.com/Open-crypto-API/API",
   "bugs": {
-    "url": "https://github.com/aichbauer/express-rest-api-boilerplate/issues"
+    "url": "https://github.com/Open-crypto-API/API/issues"
   },
   "scripts": {
     "start": "npm run nodemon",
@@ -37,19 +37,21 @@
   "dependencies": {
     "axios": "^0.19.0",
     "bcrypt-nodejs": "^0.0.3",
-    "bitcore-lib": "^8.7.1",
     "bitcoin-core": "2.2.0",
     "body-parser": "^1.18.2",
     "core-js": "^2.6.9",
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "express-routes-mapper": "^1.0.2",
-    "helmet": "^3.12.0",
+    "helmet": "^3.21.1",
     "jsonwebtoken": "^8.2.1",
     "lodash": "^4.17.15",
+    "rapids-lib": "^8.9.0",
+    "rapids-mnemonic": "^8.9.1",
     "sequelize": "^6.0.0",
     "sqlite3": "^4.0.0",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "rapids-message": "^1.0.5"
   },
   "devDependencies": {
     "cross-env": "^5.1.4",

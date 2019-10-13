@@ -2,8 +2,9 @@
 const WalletModel = require('../models/Wallet');
 const Address = require('../models/Address');
 const uuidv4 = require('uuid/v4');
-const bitcore = require('bitcore-lib');
+const bitcore = require('rapids-lib');
 const Client = require('bitcoin-core');
+const Mnemonic = require('rapids-mnemonic')
 
 // We create a client
 
@@ -20,19 +21,19 @@ const WalletController = () => {
     const { body } = req;
     if (body.walletName) {
       try {
-
         const walletId = uuidv4() + '-' + body.walletName;
         const name = walletId + body.walletName;
+        // WE GENERATE THE RANDOM WORDS HERE
+        const code = new Mnemonic(Mnemonic.Words.ENGLISH)
         const privateKey = new bitcore.PrivateKey();
         const pubKey = privateKey.toPublicKey();
         const address = pubKey.toAddress(bitcore.Networks.livenet);
-
         const walletUser = await WalletModel.create({
           walletId: walletId,
           walletName: name,
           network: 'livenet',
           walletType: 'privateKey',
-          mnemonic: '',
+          mnemonic: code.toString(),
           privateKey: privateKey.toString(),
           addresses: {
               address:address.toString(),
@@ -53,6 +54,21 @@ const WalletController = () => {
 
     return res.status(400).json({ msg: 'Bad Request: Wallet name is must' });
   };
+
+  // const createHDWallet = aysnc(req, res) => {
+  //   const { body } = req;
+  //   if (body.walletName){
+  //     try {
+  //       const walletId = uuidv4() + '-' + body.walletName
+  //       const name = walletId + body.walletName
+  //
+  //
+  //     } catch(err){
+  //       console.log(err)
+  //       return res.status(500).json({msg: 'Internal Server Error', err})
+  //     }
+  //   }
+  // }
 
 
   const check = async() => {

@@ -4,7 +4,7 @@ const Address = require('../models/Address');
 const uuidv4 = require('uuid/v4');
 const COIN = 100000000;
 const Client = require('bitcoin-core');
-const bitcore = require('bitcore-lib');
+const bitcore = require('rapids-lib');
 
 // We create a client
 
@@ -130,6 +130,7 @@ const Transactions = () => {
       return resp;
     }).catch(error => {
       console.log(error)
+      returnData = resp;
       return error;
     })
   }

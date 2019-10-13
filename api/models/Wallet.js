@@ -14,6 +14,9 @@ const Wallet = sequelize.define('Wallet', {
     type: Sequelize.STRING,
     unique:true,
   },
+  nameForUI: {
+    type: Sequelize.STRING,
+  },
   network: {
     type: Sequelize.STRING
   },
@@ -21,9 +24,6 @@ const Wallet = sequelize.define('Wallet', {
     type: Sequelize.STRING
   },
   mnemonic: {
-    type: Sequelize.STRING
-  },
-  privateKey: {
     type: Sequelize.STRING
   }
 }, {  tableName });
