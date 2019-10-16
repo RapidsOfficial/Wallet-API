@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../../config/database');
 const Address = require('./Address');
+const Backup = require('./Backup');
 
 const tableName = 'wallets';
 
@@ -16,6 +17,7 @@ const Wallet = sequelize.define('Wallet', {
   },
   nameForUI: {
     type: Sequelize.STRING,
+    unique: true,
   },
   network: {
     type: Sequelize.STRING
@@ -25,12 +27,25 @@ const Wallet = sequelize.define('Wallet', {
   },
   mnemonic: {
     type: Sequelize.STRING
+  },
+  privateKey: {
+    type: Sequelize.STRING
+  },
+  email: {
+    type:Sequelize.STRING
+  },
+  colorCode: {
+    type: Sequelize.STRING
+  },
+  backupId: {
+    type: Sequelize.INTEGER
   }
 }, {  tableName });
 
 
 
 Wallet.hasMany(Address, {as: 'addresses'});
+Backup.hasOne(Wallet, {as:'backup'})
 
 Wallet.prototype.toJSON = function () {
   const values = Object.assign({}, this.get());

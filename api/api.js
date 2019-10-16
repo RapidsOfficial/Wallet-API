@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const http = require('http');
 const mapRoutes = require('express-routes-mapper');
 const cors = require('cors');
+const morgan = require('morgan');
 
 /**
  * server configuration
@@ -37,6 +38,8 @@ app.use(helmet({
   frameguard: false,
   ieNoOpen: false,
 }));
+
+app.use(morgan('combined'))
 
 // parsing the request bodys
 app.use(bodyParser.urlencoded({ extended: false }));
