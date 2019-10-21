@@ -11,12 +11,12 @@ const Backup = sequelize.define('Backup', {
     unique: true,
   },
   password: {
-    type:Sequelize.STRING,
+    type: Sequelize.STRING,
   },
   backedUp: {
     type: Sequelize.BOOLEAN,
-  }
-}, {  tableName });
+  },
+}, { tableName });
 
 
 Backup.prototype.toJSON = function () {

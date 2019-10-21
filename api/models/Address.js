@@ -2,17 +2,18 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../../config/database');
 const Wallet = require('./Wallet');
+
 const tableName = 'addresses';
 
 
 const Address = sequelize.define('Addresses', {
   network: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
-  address:{
-    type: Sequelize.JSON
-  }
-}, {  tableName });
+  address: {
+    type: Sequelize.JSON,
+  },
+}, { tableName });
 
 
 Address.prototype.toJSON = function () {

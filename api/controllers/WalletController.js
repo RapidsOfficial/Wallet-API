@@ -4,18 +4,19 @@ const Address = require('../models/Address');
 const uuidv4 = require('uuid/v4');
 const bitcore = require('rapids-lib');
 const Client = require('bitcoin-core');
-const Mnemonic = require('rapids-mnemonic')
+const Mnemonic = require('rapids-mnemonic');
 const _ = require('lodash');
 const morgan = require('morgan');
 const Backup = require('../models/Backup');
 
 // We create a client
 
-const client = new Client( { network:'mainnet', port: 8332, username:'dashrpc', password:'password',  host: '0.0.0.0'} )
+const client = new Client({
+  network: 'mainnet', port: 8332, username: 'dashrpc', password: 'password', host: '0.0.0.0',
+});
 
 
-
-const network = 'livenet' // or 'livenet'
+const network = 'livenet'; // or 'livenet'
 
 let globalAccount;
 
@@ -24,34 +25,36 @@ const WalletController = () => {
     const { body } = req;
     if (body.walletName) {
       try {
-        const walletId = uuidv4() + '-' + body.walletName;
+        const walletId = `${uuidv4()}-${body.walletName}`;
         const name = walletId + body.walletName;
         // WE GENERATE THE RANDOM WORDS HERE
-        const code = new Mnemonic(Mnemonic.Words.ENGLISH)
+        const code = new Mnemonic(Mnemonic.Words.ENGLISH);
         const privateKey = new bitcore.PrivateKey();
         const pubKey = privateKey.toPublicKey();
         const address = pubKey.toAddress(bitcore.Networks.livenet);
         const walletUser = await WalletModel.create({
-          walletId: walletId,
+          walletId,
           walletName: name,
           network: 'livenet',
           walletType: 'privateKey',
           mnemonic: code.toString(),
           privateKey: privateKey.toString(),
           addresses: {
-              address:address.toString(),
-              network:'livenet'
-          }
+            address: address.toString(),
+            network: 'livenet',
+          },
         }, {
-          include: [{ model: Address,
-                    as: 'addresses'}]
+          include: [{
+            model: Address,
+            as: 'addresses',
+          }],
         });
         // sending the walletAddress to be underWatch from CLI
-        await importAddress(address.toString(), name)
+        await importAddress(address.toString(), name);
         return res.status(200).json({ walletUser });
       } catch (err) {
         console.log(err);
-        return res.status(500).json({ msg: 'Internal server error' , err});
+        return res.status(500).json({ msg: 'Internal server error', err });
       }
     }
 
@@ -64,49 +67,47 @@ const WalletController = () => {
     // Maybe we should check the backup wallet beforeEach request
 
 
-    if (body.walletId && body.phrases && body.password ) {
+    if (body.walletId && body.phrases && body.password) {
       // Check now
-      try{
+      try {
         // So it needs to fetch the information about the wallet match the phrase and then stores them.
         const walletFromDB = await WalletModel.findAll({
           where: {
-            walletId: body.walletId
-          }
-        })
+            walletId: body.walletId,
+          },
+        });
 
         // Get converted data
 
-        data = await conversions(walletFromDB)
+        data = await conversions(walletFromDB);
 
         // Now it will use the above
-        if (!_.isNull(data[0].backupId)){
-          return res.status(200).json({msg: 'Wallet is already backed up'})
+        if (!_.isNull(data[0].backupId)) {
+          return res.status(200).json({ msg: 'Wallet is already backed up' });
         }
-        if (_.isEqual(data[0].mnemonic, body.phrases)){
-        const backup =  await Backup.create({
+        if (_.isEqual(data[0].mnemonic, body.phrases)) {
+          const backup = await Backup.create({
             walletId: data[0].walletId,
             password: body.password,
-            backedUp: true
-          })
+            backedUp: true,
+          });
 
           //  Now we write to wallet.update()
-          conv = await conversions(backup)
-          console.log("Here",conv);
+          conv = await conversions(backup);
+          console.log('Here', conv);
           const update = await WalletModel.update({
-              backupId: conv.id
-            }, {
-              where :{
-              walletId: data[0].walletId
-            }
-          })
-          return res.status(200).json({ true:true });
-        } else {
-          return res.status(400).json({msg: 'Bad Request: Phrases does not match up'})
+            backupId: conv.id,
+          }, {
+            where: {
+              walletId: data[0].walletId,
+            },
+          });
+          return res.status(200).json({ true: true });
         }
-
+        return res.status(400).json({ msg: 'Bad Request: Phrases does not match up' });
       } catch (err) {
         console.log(err);
-        return res.status(500).json({ msg: 'Internal server error' , err});
+        return res.status(500).json({ msg: 'Internal server error', err });
       }
     }
 
@@ -122,28 +123,26 @@ const WalletController = () => {
 
     if (body.walletId) {
       // Check now
-      try{
+      try {
         // So it needs to fetch the information about the wallet match the phrase and then stores them.
         const walletFromDB = await WalletModel.findAll({
           where: {
-            walletId: body.walletId
-          }
-        })
+            walletId: body.walletId,
+          },
+        });
 
         // Get converted data
 
-        data = await conversions(walletFromDB)
+        data = await conversions(walletFromDB);
 
         // Now it will use the above
-        if (!_.isNull(data[0].backupId)){
-          return res.status(200).json({msg: 'Wallet is already backed up'})
-        } else {
-          return res.status(400).json({msg: 'Wallet is not backed up'})
+        if (!_.isNull(data[0].backupId)) {
+          return res.status(200).json({ msg: 'Wallet is already backed up' });
         }
-
+        return res.status(400).json({ msg: 'Wallet is not backed up' });
       } catch (err) {
         console.log(err);
-        return res.status(500).json({ msg: 'Internal server error' , err});
+        return res.status(500).json({ msg: 'Internal server error', err });
       }
     }
 
@@ -151,41 +150,34 @@ const WalletController = () => {
   };
 
 
-
-  const conversions = async(obj) => {
+  const conversions = async (obj) => {
     objects = JSON.stringify(obj);
     cal = JSON.parse(objects);
     return cal;
-  }
+  };
 
 
-  const check = async() => {
+  const check = async () => {
     client.getInfo().then((info) => {
-      if (info.version == 1000001){
-        return true
-      } else {
-        return false;
+      if (info.version == 1000001) {
+        return true;
       }
-    }).catch(error => {
-      return error;
-    })
-
-  }
+      return false;
+    }).catch((error) => error);
+  };
   const importAddress = async (address, name) => {
-
     await client.importAddress(address, name, true).then((resp) => {
-        console.log('Address has been imported');
-      }).catch(error => {
-        console.log('Address has not been imported', error)
-        return error;
-      })
-
-  }
+      console.log('Address has been imported');
+    }).catch((error) => {
+      console.log('Address has not been imported', error);
+      return error;
+    });
+  };
 
   return {
     createWallet,
     createBackup,
-    getBackupStatus
+    getBackupStatus,
   };
 };
 

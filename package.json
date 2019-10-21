@@ -18,7 +18,7 @@
     "nodemon": "nodemon --exec npm run dev",
     "create-sqlite-db": "shx touch ./db/database.sqlite",
     "drop-sqlite-db": "shx rm ./db/database.sqlite",
-    "lint": "eslint ./api/. ./config/. ./test/.",
+    "lint": "eslint ./api/. ./config/. ./test/. --fix",
     "prepush": "npm test",
     "pretest": "npm run lint",
     "production": "cross-env NODE_ENV=production node ./api/api.js",

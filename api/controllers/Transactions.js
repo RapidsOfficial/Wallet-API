@@ -2,16 +2,19 @@
 const WalletModel = require('../models/Wallet');
 const Address = require('../models/Address');
 const uuidv4 = require('uuid/v4');
+
 const COIN = 100000000;
 const Client = require('bitcoin-core');
 const bitcore = require('rapids-lib');
 
 // We create a client
 
-const client = new Client( { network:'mainnet', port: 8332, username:'dashrpc', password:'password',  host: '0.0.0.0'} )
+const client = new Client({
+  network: 'mainnet', port: 8332, username: 'dashrpc', password: 'password', host: '0.0.0.0',
+});
 
 let utxos;
-const network = 'livenet' // or 'livenet'
+const network = 'livenet'; // or 'livenet'
 let returnData;
 const Transactions = () => {
   const createTransaction = async (req, res) => {
@@ -20,9 +23,9 @@ const Transactions = () => {
       try {
         const walletFromDB = await WalletModel.findAll({
           where: {
-            walletId: body.walletId
-          }
-        })
+            walletId: body.walletId,
+          },
+        });
 
         objects = JSON.stringify(walletFromDB);
         cal = JSON.parse(objects);
@@ -30,17 +33,17 @@ const Transactions = () => {
         privateKey = cal[0].privateKey;
         address = await Address.findAll({
           where: {
-            walletId: cal[0].id
-          }
-        })
+            walletId: cal[0].id,
+          },
+        });
 
-        addr = JSON.stringify(address)
-        addres = JSON.parse(addr)
+        addr = JSON.stringify(address);
+        addres = JSON.parse(addr);
 
-        address = addres[0].address
+        address = addres[0].address;
 
-        await getUtxos(address)
-        let privateKeys = [];
+        await getUtxos(address);
+        const privateKeys = [];
         privateKeys.push(privateKey);
         // Create Transactions
         money = body.amount;
@@ -50,14 +53,14 @@ const Transactions = () => {
           amnount: money,
           satoshis: satoshi,
           recipient: toSend,
-          privateKeys: privateKeys,
-          utxos: utxos
-        }
+          privateKeys,
+          utxos,
+        };
         const rawTx = new bitcore.Transaction()
-                      .from(utxos)
-                      .to(toSend, satoshi)
-                      .change(address)
-                      .sign(privateKey)
+          .from(utxos)
+          .to(toSend, satoshi)
+          .change(address)
+          .sign(privateKey);
 
 
         await sendRawTransaction(rawTx.toString());
@@ -65,7 +68,7 @@ const Transactions = () => {
         return res.status(200).json({ returnData });
       } catch (err) {
         console.log(err);
-        return res.status(500).json({ msg: 'Internal server error' , err});
+        return res.status(500).json({ msg: 'Internal server error', err });
       }
     }
 
@@ -79,9 +82,9 @@ const Transactions = () => {
       try {
         const walletFromDB = await WalletModel.findAll({
           where: {
-            walletId: body.walletId
-          }
-        })
+            walletId: body.walletId,
+          },
+        });
 
         objects = JSON.stringify(walletFromDB);
         cal = JSON.parse(objects);
@@ -92,21 +95,21 @@ const Transactions = () => {
         privateKeys.push(privateKey);
 
         opts = {
-          transport, network, mnemonic, privateKey
-        }
+          transport, network, mnemonic, privateKey,
+        };
         const wallet = new Wallet(opts);
 
-        const account = wallet.getAccount({index:2});
+        const account = wallet.getAccount({ index: 2 });
 
         // Create Transactions
         const tx = account.getTransaction(req.params.id);
 
         wallet.disconnect();
-        account.disconnect()
+        account.disconnect();
         return res.status(200).json({ tx });
       } catch (err) {
         console.log(err);
-        return res.status(500).json({ msg: 'Internal server error' , err});
+        return res.status(500).json({ msg: 'Internal server error', err });
       }
     }
 
@@ -114,29 +117,29 @@ const Transactions = () => {
   };
 
 
-  const getUtxos = async(address) => {
+  const getUtxos = async (address) => {
     await client.listUnspent(0, 9999999, [address], 2).then((resp) => {
-      utxos = resp
-      return resp
-    }).catch(error => {
-      console.log(error)
-      return error
-    })
-  }
+      utxos = resp;
+      return resp;
+    }).catch((error) => {
+      console.log(error);
+      return error;
+    });
+  };
 
-  const sendRawTransaction = async(hex) => {
+  const sendRawTransaction = async (hex) => {
     await client.sendRawTransaction(hex).then((resp) => {
       returnData = resp;
       return resp;
-    }).catch(error => {
-      console.log(error)
+    }).catch((error) => {
+      console.log(error);
       returnData = resp;
       return error;
-    })
-  }
+    });
+  };
   return {
     createTransaction,
-    getTransaction
+    getTransaction,
   };
 };
 

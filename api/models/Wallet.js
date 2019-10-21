@@ -11,41 +11,40 @@ const Wallet = sequelize.define('Wallet', {
     type: Sequelize.STRING,
     unique: true,
   },
-  walletName:{
+  walletName: {
     type: Sequelize.STRING,
-    unique:true,
+    unique: true,
   },
   nameForUI: {
     type: Sequelize.STRING,
     unique: true,
   },
   network: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   walletType: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   mnemonic: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   privateKey: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   email: {
-    type:Sequelize.STRING
+    type: Sequelize.STRING,
   },
   colorCode: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   backupId: {
-    type: Sequelize.INTEGER
-  }
-}, {  tableName });
+    type: Sequelize.INTEGER,
+  },
+}, { tableName });
 
 
-
-Wallet.hasMany(Address, {as: 'addresses'});
-Backup.hasOne(Wallet, {as:'backup'})
+Wallet.hasMany(Address, { as: 'addresses' });
+Backup.hasOne(Wallet, { as: 'backup' });
 
 Wallet.prototype.toJSON = function () {
   const values = Object.assign({}, this.get());

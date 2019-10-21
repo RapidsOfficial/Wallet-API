@@ -1,12 +1,12 @@
-var Message = require('rapids-message');
-const  authService  = require('../../api/services/auth.service');
+const Message = require('rapids-message');
+const authService = require('../../api/services/auth.service');
 
 const bitcore = require('rapids-lib');
 
 let message;
 let signature;
 let address;
-let badAddress = 'RbnYw5oeXHrf9cPzNT9gm22fMUKNJC68hL';
+const badAddress = 'RbnYw5oeXHrf9cPzNT9gm22fMUKNJC68hL';
 
 beforeEach(async () => {
   const privateKey = new bitcore.PrivateKey();
@@ -18,13 +18,12 @@ beforeEach(async () => {
 });
 
 
-
 test('Sign and verify is working as expected', async () => {
-  console.log('Sign and verify is working as expected')
+  console.log('Sign and verify is working as expected');
   expect(authService().verifySignature(address.toString(), signature)).toBeTruthy();
 });
 
-test('Sign and verify is not working as expected because of bad address', async() => {
-  console.log('Sign and verify is not working as expected because of bad address')
+test('Sign and verify is not working as expected because of bad address', async () => {
+  console.log('Sign and verify is not working as expected because of bad address');
   expect(authService().verifySignature(badAddress, signature)).toBeFalsy();
-})
+});

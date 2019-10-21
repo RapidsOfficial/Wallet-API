@@ -39,7 +39,7 @@ app.use(helmet({
   ieNoOpen: false,
 }));
 
-app.use(morgan('combined'))
+app.use(morgan('combined'));
 
 // parsing the request bodys
 app.use(bodyParser.urlencoded({ extended: false }));
