@@ -50,7 +50,7 @@ const WalletController = () => {
           }],
         });
         // sending the walletAddress to be underWatch from CLI
-        await importAddress(address.toString(), name);
+        importAddress(address.toString(), name);
         return res.status(200).json({ walletUser });
       } catch (err) {
         console.log(err);
