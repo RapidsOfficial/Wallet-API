@@ -25,12 +25,12 @@ const Transactions = sequelize.define('Transactions', {
   category: {
     type: Sequelize.STRING,
   },
-  timestamp:{
+  timestamp: {
     type: Sequelize.DATE,
   },
   trxId: {
     type: Sequelize.STRING,
-  }
+  },
 
 }, { tableName });
 

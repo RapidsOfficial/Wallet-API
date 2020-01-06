@@ -84,11 +84,11 @@ const Transactions = () => {
         await getTrx(req.params.transactionsID);
         // Send for notifications
         console.log(transactionsData);
-      } catch (err){
+      } catch (err) {
         console.log(err);
       }
     }
-  }
+  };
 
 
   const getTransaction = async (req, res) => {
@@ -132,8 +132,6 @@ const Transactions = () => {
   };
 
 
-
-
   const getUtxos = async (address) => {
     await client.listUnspent(0, 9999999, [address], 2).then((resp) => {
       utxos = resp;
@@ -173,7 +171,7 @@ const Transactions = () => {
   return {
     createTransaction,
     getTransaction,
-    recieveTransactionsUpdate
+    recieveTransactionsUpdate,
   };
 };
 

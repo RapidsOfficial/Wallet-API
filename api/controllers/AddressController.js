@@ -48,10 +48,10 @@ const AddressController = () => {
     return res.status(400).json({ msg: 'Bad Request: Address field is must' });
   };
 
-  const generateAddress = async(req, res) => {
+  const generateAddress = async (req, res) => {
     const { body, query } = req;
     const walletId = body.walletId || query.walletId;
-    if (walletId){
+    if (walletId) {
       try {
         // We get wallet
         const walletFromDB = await WalletModel.findAll({
@@ -63,21 +63,20 @@ const AddressController = () => {
         data = await conversions(walletFromDB);
 
         // We need to fetch the private key and generate public address
-        const privateKey = new PrivateKey(data[0].privateKey)
+        const privateKey = new PrivateKey(data[0].privateKey);
         const pubKey = privateKey.toPublicKey();
         const address = pubKey.toAddress(bitcore.Networks.livenet);
 
         // Now we can save the address
         address = Address.create({
           network: 'livenet',
-          address: address,
-          walletId: data[0].id
+          address,
+          walletId: data[0].id,
         });
 
         return res.status(200).json({ address });
-
-      }catch(err){
-        return res.status(500).json({msg: 'Internal Server Error', err})
+      } catch (err) {
+        return res.status(500).json({ msg: 'Internal Server Error', err });
       }
     }
     return res.status(400).json({ msg: 'Bad Request: Wallet Id field is must' });
@@ -106,8 +105,6 @@ const AddressController = () => {
     cal = JSON.parse(objects);
     return cal;
   };
-
-
 
 
   return {

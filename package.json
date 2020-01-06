@@ -12,7 +12,7 @@
     "url": "https://github.com/Open-crypto-API/API/issues"
   },
   "scripts": {
-    "prestart":"npm run drop-sqlite-db || true",
+    "prestart": "npm run drop-sqlite-db || true",
     "start": "npm run nodemon",
     "poststart": "npm run create-sqlite-db",
     "dev": "cross-env NODE_ENV=development node ./api/api.js",
