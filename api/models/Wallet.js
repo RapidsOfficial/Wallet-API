@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const sequelize = require('../../config/database');
 const Address = require('./Address');
 const Backup = require('./Backup');
+const Transactions = require('./Transactions');
 
 const tableName = 'wallets';
 

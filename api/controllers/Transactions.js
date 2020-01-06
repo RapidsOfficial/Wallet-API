@@ -16,6 +16,7 @@ const client = new Client({
 let utxos;
 const network = 'livenet'; // or 'livenet'
 let returnData;
+let transactionsData;
 const Transactions = () => {
   const createTransaction = async (req, res) => {
     const { body } = req;
@@ -64,6 +65,7 @@ const Transactions = () => {
 
 
         await sendRawTransaction(rawTx.toString());
+        // Since this is a send transactions we store this in the databse
 
         return res.status(200).json({ returnData });
       } catch (err) {
@@ -75,9 +77,22 @@ const Transactions = () => {
     return res.status(400).json({ msg: 'Bad Request: Fields missing is required' });
   };
 
+  const recieveTransactionsUpdate = async (req, res) => {
+    if (req.params.transactionsID) {
+      try {
+        // First we fetch transactions data
+        await getTrx(req.params.transactionsID);
+        // Send for notifications
+        console.log(transactionsData);
+      } catch (err){
+        console.log(err);
+      }
+    }
+  }
+
+
   const getTransaction = async (req, res) => {
     const { body } = req;
-    console.log(req.params);
     if (body.walletId && req.params.id) {
       try {
         const walletFromDB = await WalletModel.findAll({
@@ -117,6 +132,8 @@ const Transactions = () => {
   };
 
 
+
+
   const getUtxos = async (address) => {
     await client.listUnspent(0, 9999999, [address], 2).then((resp) => {
       utxos = resp;
@@ -126,6 +143,10 @@ const Transactions = () => {
       return error;
     });
   };
+
+  // const decodeTransactions = aysnc(hex) => {
+  //   await client.getTransaction
+  // }
 
   const sendRawTransaction = async (hex) => {
     await client.sendRawTransaction(hex).then((resp) => {
@@ -137,9 +158,22 @@ const Transactions = () => {
       return error;
     });
   };
+
+  const getTrx = async (trxId) => {
+    await client.getTransaction(trxId).then((resp) => {
+      transactionsData = resp;
+      return resp;
+    }).catch((error) => {
+      console.log(error);
+      return error;
+    });
+  };
+
+
   return {
     createTransaction,
     getTransaction,
+    recieveTransactionsUpdate
   };
 };
 

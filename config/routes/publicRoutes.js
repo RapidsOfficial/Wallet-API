@@ -9,6 +9,7 @@ const publicRoutes = {
   'GET /address': 'AddressController.getAddress',
   'POST /send': 'Transactions.createTransaction',
   'GET /backup/status': 'WalletController.getBackupStatus',
+  'GET /transactions/:transactionsID' : 'Transactions.recieveTransactionsUpdate'
 };
 
 module.exports = publicRoutes;

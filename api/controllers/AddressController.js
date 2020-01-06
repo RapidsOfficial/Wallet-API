@@ -12,14 +12,14 @@ let account;
 
 const AddressController = () => {
   const getAddress = async (req, res) => {
-    const { body , query } = req;
-    let walletId = body.walletId || query.walletId
+    const { body, query } = req;
+    const walletId = body.walletId || query.walletId;
     if (walletId) {
       try {
         // Get walletId from the db clean it
         const walletFromDB = await WalletModel.findAll({
           where: {
-            walletId: walletId,
+            walletId,
           },
         });
 
@@ -45,10 +45,43 @@ const AddressController = () => {
         return res.status(500).json({ msg: 'Internal server error', err });
       }
     }
-
     return res.status(400).json({ msg: 'Bad Request: Address field is must' });
   };
 
+  const generateAddress = async(req, res) => {
+    const { body, query } = req;
+    const walletId = body.walletId || query.walletId;
+    if (walletId){
+      try {
+        // We get wallet
+        const walletFromDB = await WalletModel.findAll({
+          where: {
+            walletId,
+          },
+        });
+
+        data = await conversions(walletFromDB);
+
+        // We need to fetch the private key and generate public address
+        const privateKey = new PrivateKey(data[0].privateKey)
+        const pubKey = privateKey.toPublicKey();
+        const address = pubKey.toAddress(bitcore.Networks.livenet);
+
+        // Now we can save the address
+        address = Address.create({
+          network: 'livenet',
+          address: address,
+          walletId: data[0].id
+        });
+
+        return res.status(200).json({ address });
+
+      }catch(err){
+        return res.status(500).json({msg: 'Internal Server Error', err})
+      }
+    }
+    return res.status(400).json({ msg: 'Bad Request: Wallet Id field is must' });
+  };
 
   // / I need to be able to fetch balance from the API
 
@@ -67,6 +100,14 @@ const AddressController = () => {
         console.log(error);
       });
   };
+
+  const conversions = async (obj) => {
+    objects = JSON.stringify(obj);
+    cal = JSON.parse(objects);
+    return cal;
+  };
+
+
 
 
   return {

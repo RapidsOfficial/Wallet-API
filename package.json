@@ -12,6 +12,7 @@
     "url": "https://github.com/Open-crypto-API/API/issues"
   },
   "scripts": {
+    "prestart":"npm run drop-sqlite-db || true",
     "start": "npm run nodemon",
     "poststart": "npm run create-sqlite-db",
     "dev": "cross-env NODE_ENV=development node ./api/api.js",
@@ -52,7 +53,8 @@
     "rapids-mnemonic": "^8.9.1",
     "sequelize": "^6.0.0",
     "sqlite3": "^4.0.0",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "zeromq": "^5.2.0"
   },
   "devDependencies": {
     "cross-env": "^5.1.4",

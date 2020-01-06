@@ -12,7 +12,7 @@ const Backup = require('../models/Backup');
 // We create a client
 
 const client = new Client({
-  network: 'mainnet', port: 8332, username: 'dashrpc', password: 'password', host: '0.0.0.0',
+  network: 'mainnet', port: 8332, username: 'dashrpc', password: 'password', host: 'localhost',
 });
 
 
@@ -94,7 +94,6 @@ const WalletController = () => {
 
           //  Now we write to wallet.update()
           conv = await conversions(backup);
-          console.log('Here', conv);
           const update = await WalletModel.update({
             backupId: conv.id,
           }, {
@@ -166,7 +165,7 @@ const WalletController = () => {
     }).catch((error) => error);
   };
   const importAddress = async (address, name) => {
-    await client.importAddress(address, name, true).then((resp) => {
+    client.importAddress(address, name, true).then((resp) => {
       console.log('Address has been imported');
     }).catch((error) => {
       console.log('Address has not been imported', error);
