@@ -10,6 +10,7 @@ const publicRoutes = {
   'POST /send': 'Transactions.createTransaction',
   'GET /backup/status': 'WalletController.getBackupStatus',
   'GET /transactions/:transactionsID': 'Transactions.recieveTransactionsUpdate',
+  'POST /address/new' : 'AddressController.generateAddress'
 };
 
 module.exports = publicRoutes;
