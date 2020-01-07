@@ -2,6 +2,7 @@ const WalletModel = require('../models/Wallet');
 const Address = require('../models/Address');
 const axios = require('axios');
 const _ = require('lodash');
+const bitcore = require('rapids-lib');
 
 const network = 'livenet'; // or 'testnet'
 
@@ -61,20 +62,19 @@ const AddressController = () => {
         });
 
         data = await conversions(walletFromDB);
-
+        console.log(data[0].id)
         // We need to fetch the private key and generate public address
-        const privateKey = new PrivateKey(data[0].privateKey);
+        const privateKey = new bitcore.PrivateKey(data[0].privateKey);
         const pubKey = privateKey.toPublicKey();
         const address = pubKey.toAddress(bitcore.Networks.livenet);
-
+        const rapidsAddress = address.toString();
         // Now we can save the address
-        address = Address.create({
+      const dataToPost = await Address.create({
           network: 'livenet',
-          address,
-          walletId: data[0].id,
+          address: address.toString(),
+          WalletId: data[0].id,
         });
-
-        return res.status(200).json({ address });
+        return res.status(200).json({ rapidsAddress });
       } catch (err) {
         return res.status(500).json({ msg: 'Internal Server Error', err });
       }
@@ -109,6 +109,7 @@ const AddressController = () => {
 
   return {
     getAddress,
+    generateAddress
   };
 };
 

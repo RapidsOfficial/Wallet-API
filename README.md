@@ -4,6 +4,13 @@ Standardised API for creating wallet, retrieving, without much hassle
 
 Next version is for security like keeping private keys safe.
 
+## For Developmemt Settings
+
+```
+"prestart": "npm run drop-sqlite-db || true",
+
+```
+
 
 ## For custom network settings
 
